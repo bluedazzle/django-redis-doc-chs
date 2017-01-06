@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>django-redis 官方文档中文版 &mdash; Django-Redis 4.7.0 文档</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="索引"
+              href="genindex.html"/>
+        <link rel="search" title="搜索" href="search.html"/>
+    <link rel="top" title="Django-Redis 4.7.0 文档" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Django-Redis
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                4.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">django-redis 官方文档中文版</a><ul>
+<li><a class="reference internal" href="#id1">1. 介绍</a><ul>
+<li><a class="reference internal" href="#id2">1.1 为何要用 django-redis ?</a></li>
+<li><a class="reference internal" href="#id3">1.2 可用的 django-redis 版本</a></li>
+<li><a class="reference internal" href="#id4">1.3 我该使用哪个版本</a></li>
+<li><a class="reference internal" href="#id5">1.4 依赖</a><ul>
+<li><a class="reference internal" href="#django">1.4.1 Django 版本支持</a></li>
+<li><a class="reference internal" href="#redis-server">1.4.2 Redis Server 支持</a></li>
+<li><a class="reference internal" href="#id6">1.4.3 其他依赖</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">2. 用户指南</a><ul>
+<li><a class="reference internal" href="#id8">2.1 安装</a></li>
+<li><a class="reference internal" href="#cache-backend">2.2 作为 cache backend 使用配置</a></li>
+<li><a class="reference internal" href="#session-backend">2.3 作为 session backend 使用配置</a></li>
+<li><a class="reference internal" href="#id9">2.4 使用 django-redis 进行测试</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">3. 进阶使用</a><ul>
+<li><a class="reference internal" href="#pickle">3.1 Pickle 版本</a></li>
+<li><a class="reference internal" href="#id11">3.2 套接字超时</a></li>
+<li><a class="reference internal" href="#id12">3.3 压缩支持</a></li>
+<li><a class="reference internal" href="#memcached">3.4 memcached 异常行为</a></li>
+<li><a class="reference internal" href="#id13">3.5 日志忽略异常</a></li>
+<li><a class="reference internal" href="#id14">3.6 永不超时设置</a></li>
+<li><a class="reference internal" href="#value-ttl-time-to-live">3.7 通过值 (value) 获取 ttl (time to live)</a></li>
+<li><a class="reference internal" href="#expire-persist">3.8 expire &amp; persist</a></li>
+<li><a class="reference internal" href="#locks">3.9 locks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">Django-Redis</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>django-redis 官方文档中文版</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="django-redis">
+<h1>django-redis 官方文档中文版<a class="headerlink" href="#django-redis" title="永久链接至标题">¶</a></h1>
+<div class="section" id="id1">
+<h2>1. 介绍<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h2>
+<p>django-redis 基于 BSD 许可, 是一个使 Django 支持 Redis cache/session
+后端的全功能组件.</p>
+<div class="section" id="id2">
+<h3>1.1 为何要用 django-redis ?<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h3>
+<p>因为:</p>
+<ul class="simple">
+<li>持续更新</li>
+<li>本地化的 redis-py URL 符号连接字符串</li>
+<li>可扩展客户端</li>
+<li>可扩展解析器</li>
+<li>可扩展序列器</li>
+<li>默认客户端主/从支持</li>
+<li>完善的测试</li>
+<li>已在一些项目的生产环境中作为 cache 和 session 使用</li>
+<li>支持无限长超时设置</li>
+<li>原生进入 redis 客户端/连接池支持</li>
+<li>高可配置 ( 例如仿真缓存的异常行为 )</li>
+<li>默认支持 unix 套接字</li>
+<li>支持 Python 2.7, 3.4, 3.5 以及 3.6</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>1.2 可用的 django-redis 版本<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h3>
+<ul class="simple">
+<li>稳定版本: 4.7.0</li>
+<li>稳定版本: 3.8.4</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>1.3 我该使用哪个版本<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h3>
+<p>版本号像 3.6, 3.7 … 等的是主要发行版本, 会包含向后不兼容的内容.
+跟多信息请在升级前阅读升级日志.</p>
+<p>版本号像 3.7.0, 3.7.1… 等的是小更新或者 bug 修复版本, 一般只会包含 bug
+修复, 没有功能更新.</p>
+</div>
+<div class="section" id="id5">
+<h3>1.4 依赖<a class="headerlink" href="#id5" title="永久链接至标题">¶</a></h3>
+<div class="section" id="django">
+<h4>1.4.1 Django 版本支持<a class="headerlink" href="#django" title="永久链接至标题">¶</a></h4>
+<ul class="simple">
+<li>django-redis 3.8.x 支持 django 1.4, 1.5, 1.6, 1.7 (或许会有 1.8)</li>
+<li>django-redis 4.4.x 支持 django 1.6, 1.7, 1.8, 1.9 和 1.10</li>
+</ul>
+</div>
+<div class="section" id="redis-server">
+<h4>1.4.2 Redis Server 支持<a class="headerlink" href="#redis-server" title="永久链接至标题">¶</a></h4>
+<ul class="simple">
+<li>django-redis 3.x.y 支持 redis-server 2.6.x 或更高</li>
+<li>django-redis 4.x.y 支持 redis-server 2.8.x 或更高</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h4>1.4.3 其他依赖<a class="headerlink" href="#id6" title="永久链接至标题">¶</a></h4>
+<p>所有版本的 django-redis 基于 redis-py &gt;= 2.10.0.</p>
+</div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>2. 用户指南<a class="headerlink" href="#id7" title="永久链接至标题">¶</a></h2>
+<div class="section" id="id8">
+<h3>2.1 安装<a class="headerlink" href="#id8" title="永久链接至标题">¶</a></h3>
+<p>安装 django-redis 最简单的方法就是用 pip :</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">pip</span> <span class="n">install</span> <span class="n">django</span><span class="o">-</span><span class="n">redis</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cache-backend">
+<h3>2.2 作为 cache backend 使用配置<a class="headerlink" href="#cache-backend" title="永久链接至标题">¶</a></h3>
+<p>为了使用 django-redis , 你应该将你的 django cache setting 改成这样:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>为了更好的互操作性并使连接字符串更加 “标准”, 从 3.8.0 开始 django-redis
+使用 redis-py native url notation 作为连接字符串.</p>
+<p><em>URL 格式举例</em></p>
+<div class="highlight-default"><div class="highlight"><pre>redis://[:password]@localhost:6379/0
+rediss://[:password]@localhost:6379/0
+unix://[:password]@/path/to/socket.sock?db=0
+</pre></div>
+</div>
+<p>支持三种 URL scheme :</p>
+<ul class="simple">
+<li>redis://: 普通的 TCP 套接字连接</li>
+<li>rediss://: SSL 包裹的 TCP 套接字连接</li>
+<li>unix://: Unix 域套接字连接</li>
+</ul>
+<p>指定数据库数字的方法:</p>
+<ul class="simple">
+<li>db 查询参数, 例如: redis://localhost?db=0</li>
+<li>如果使用 redis:// scheme, 可以直接将数字写在路径中, 例如:
+redis://localhost/0</li>
+</ul>
+<p>在某些环境下连接密码不是 url 安全的, 这时你可以忽略密码或者使用方便的
+OPTIONS 设置:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+            <span class="s">&quot;PASSWORD&quot;</span><span class="p">:</span> <span class="s">&quot;mysecret&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>注意, 这样配置不会覆盖 uri 中的密码, 所以如果你已经在 uri 中设置了密码,
+此设置将被忽略.</p>
+</div>
+<div class="section" id="session-backend">
+<h3>2.3 作为 session backend 使用配置<a class="headerlink" href="#session-backend" title="永久链接至标题">¶</a></h3>
+<p>Django 默认可以使用任何 cache backend 作为 session backend, 将
+django-redis 作为 session 储存后端不用安装任何额外的 backend</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">SESSION_ENGINE</span> <span class="o">=</span> <span class="s">&quot;django.contrib.sessions.backends.cache&quot;</span>
+<span class="n">SESSION_CACHE_ALIAS</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h3>2.4 使用 django-redis 进行测试<a class="headerlink" href="#id9" title="永久链接至标题">¶</a></h3>
+<p>django-redis 支持定制基于 Redis 的客户端 ( 参考[可扩展 redis 客户端][] )
+可以用来测试, 例如: 替换默认的客户端为 fakerdis
+(<a class="reference external" href="https://github.com/jamesls/fakeredis">https://github.com/jamesls/fakeredis</a>) 或者 mockredis
+(<a class="reference external" href="https://github.com/locationlabs/mockredis">https://github.com/locationlabs/mockredis</a>). 这样做可以不用依赖真的
+redis server 做集成测试.</p>
+<p><em>使用 fakeredis 举例:</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">fakeredis</span>
+<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;REDIS_CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;fakeredis.FakeStrictRedis&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>如果在测试完毕后想清理所有数据, 在你的 TestCase 中加入如下代码:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">django_redis</span> <span class="k">import</span> <span class="n">get_redis_connection</span>
+    <span class="n">get_redis_connection</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">flushall</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id10">
+<h2>3. 进阶使用<a class="headerlink" href="#id10" title="永久链接至标题">¶</a></h2>
+<div class="section" id="pickle">
+<h3>3.1 Pickle 版本<a class="headerlink" href="#pickle" title="永久链接至标题">¶</a></h3>
+<p>django-redis 使用 pickle 序列化几乎所有数据.</p>
+<p>默认使用最新的 pickle. 如果你想设置其他版本, 使用 PICKLE_VERSION 参数:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># ...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;PICKLE_VERSION&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>  <span class="c"># Use the latest protocol version</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id11">
+<h3>3.2 套接字超时<a class="headerlink" href="#id11" title="永久链接至标题">¶</a></h3>
+<p>套接字超时设置使用 SOCKET_TIMEOUT 和 SOCKET_CONNECT_TIMEOUT 参数:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># ...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;SOCKET_CONNECT_TIMEOUT&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>  <span class="c"># in seconds</span>
+            <span class="s">&quot;SOCKET_TIMEOUT&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>  <span class="c"># in seconds</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>SOCKET_CONNECT_TIMEOUT : socket 建立连接超时设置</p>
+<p>SOCKET_TIMEOUT : 连接建立后的读写操作超时设置</p>
+</div>
+<div class="section" id="id12">
+<h3>3.3 压缩支持<a class="headerlink" href="#id12" title="永久链接至标题">¶</a></h3>
+<p>django-redis 支持压缩, 但默认是关闭的. 你可以激活它:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># ...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;COMPRESSOR&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.compressors.zlib.ZlibCompressor&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>使用 lzma 压缩的例子:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">lzma</span>
+
+<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># ...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;COMPRESSOR&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.compressors.lzma.LzmaCompressor&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="memcached">
+<h3>3.4 memcached 异常行为<a class="headerlink" href="#memcached" title="永久链接至标题">¶</a></h3>
+<p>在某些情况下, redis 只作为缓存使用, 当它关闭时如果你不希望触发异常. 这是
+memcached backend 的默认行为, 你可以使用 django-redis 模拟这种情况.</p>
+<p>为了设置这种类似memcached 的行为 ( 忽略连接异常 ), 使用
+IGNORE_EXCEPTIONS 参数:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># ...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;IGNORE_EXCEPTIONS&quot;</span><span class="p">:</span> <span class="k">True</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Also, you can apply the same settings to all configured caches, you can
+set the global flag in your settings:</p>
+<p>当然,你也可以给所有缓存配置相同的忽略行为:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">DJANGO_REDIS_IGNORE_EXCEPTIONS</span> <span class="o">=</span> <span class="k">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h3>3.5 日志忽略异常<a class="headerlink" href="#id13" title="永久链接至标题">¶</a></h3>
+<p>当使用 IGNORE_EXCEPTIONS 或者 DJANGO_REDIS_IGNORE_EXCEPTIONS
+参数忽略异常时, 你也许会用到 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS
+参数来配置日志异常:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS</span> <span class="o">=</span> <span class="k">True</span>
+</pre></div>
+</div>
+<p>如果你想设置指定的 logger 输出异常, 只需要设置全局变量
+DJANGO_REDIS_LOGGER 为 logger 的名称或其路径即可. 如果没有 logger
+被设置并且 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS=True 时此参数将取
+<strong>name</strong> :</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">DJANGO_REDIS_LOGGER</span> <span class="o">=</span> <span class="s">&#39;some.specified.logger&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id14">
+<h3>3.6 永不超时设置<a class="headerlink" href="#id14" title="永久链接至标题">¶</a></h3>
+<p>django-redis comes with infinite timeouts support out of the box. And it
+behaves in same way as django backend contract specifies:</p>
+<p>django-redis 支持永不超时设置. 其表现和 django backend 指定的相同:</p>
+<ul class="simple">
+<li>timeout=0 立即过期</li>
+<li>timeout=None 永不超时</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">,</span> <span class="s">&quot;value&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="k">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="value-ttl-time-to-live">
+<h3>3.7 通过值 (value) 获取 ttl (time to live)<a class="headerlink" href="#value-ttl-time-to-live" title="永久链接至标题">¶</a></h3>
+<p>With redis, you can access to ttl of any stored key, for it,
+django-redis exposes ttl function.</p>
+<p>It returns:</p>
+<p>在 redis 中, 你可以获取任何 key 的 ttl, django-redis 也支持获取 ttl
+的函数:</p>
+<p>它返回:</p>
+<ul class="simple">
+<li>0 key 不存在 (或已过期).</li>
+<li>None key 存在但没有设置过期.</li>
+<li>ttl 任何有超时设置的 key 的超时值.</li>
+</ul>
+<p>以 keys 搜索过期:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">cache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;value&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">ttl</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">25</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">ttl</span><span class="p">(</span><span class="s">&quot;not-existent&quot;</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="expire-persist">
+<h3>3.8 expire &amp; persist<a class="headerlink" href="#expire-persist" title="永久链接至标题">¶</a></h3>
+<p>除了简单的 ttl 查询, 你可以使用 persist 或者 expire
+方法让一个值永久存在或者指定一个新的过期时间:</p>
+<p>使用 persist 的例子:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">ttl</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">22</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">persist</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">ttl</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<p>使用 expire 的例子:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">expire</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">ttl</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">)</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locks">
+<h3>3.9 locks<a class="headerlink" href="#locks" title="永久链接至标题">¶</a></h3>
+<p>django-redis 支持 redis 分布式锁. 锁的线程接口是相同的,
+因此你可以使用它作为替代.</p>
+<p><em>使用 python 上下文管理器分配锁的例子</em>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="k">with</span> <span class="n">cache</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="s">&quot;somekey&quot;</span><span class="p">):</span>
+    <span class="n">do_some_thing</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, rapospectre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'4.7.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
