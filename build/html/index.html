@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>django-redis 官方文档中文版 &mdash; Django-Redis 4.7.0 文档</title>
+  <title>django-redis 中文文档 &mdash; Django-Redis 4.7.0 文档</title>
   
 
   
@@ -84,7 +84,7 @@
             
                 <!-- Local TOC -->
                 <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">django-redis 官方文档中文版</a><ul>
+<li><a class="reference internal" href="#">django-redis 中文文档</a><ul>
 <li><a class="reference internal" href="#id1">1. 介绍</a><ul>
 <li><a class="reference internal" href="#id2">1.1 为何要用 django-redis ?</a></li>
 <li><a class="reference internal" href="#id3">1.2 可用的 django-redis 版本</a></li>
@@ -114,8 +114,27 @@
 <li><a class="reference internal" href="#value-ttl-time-to-live">3.7 通过值 (value) 获取 ttl (time to live)</a></li>
 <li><a class="reference internal" href="#expire-persist">3.8 expire &amp; persist</a></li>
 <li><a class="reference internal" href="#locks">3.9 locks</a></li>
+<li><a class="reference internal" href="#keys">3.10 扫描 &amp; 删除键 (keys)</a></li>
+<li><a class="reference internal" href="#redis">3.11 Redis 本地命令</a></li>
+<li><a class="reference internal" href="#id15">3.12 原生客户端使用</a></li>
+<li><a class="reference internal" href="#id16">3.13 连接池</a><ul>
+<li><a class="reference internal" href="#id17">3.13.1 配置默认连接池</a></li>
+<li><a class="reference internal" href="#id18">3.13.2 使用你自己的连接池子类</a></li>
+<li><a class="reference internal" href="#connection-factory">3.13.3 定制化的 connection factory</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#id19">3.14 可扩展解析器</a></li>
+<li><a class="reference internal" href="#id20">3.15 可扩展客户端</a><ul>
+<li><a class="reference internal" href="#id21">3.15.1 默认客户端</a></li>
+<li><a class="reference internal" href="#id22">3.15.2 分片客户端</a></li>
+<li><a class="reference internal" href="#id23">3.15.3 集群客户端</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id24">3.16 可扩展序列器</a></li>
+<li><a class="reference internal" href="#id25">3.17 可扩展 Redis 客户端</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id26">4. 许可</a></li>
 </ul>
 </li>
 </ul>
@@ -148,7 +167,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>django-redis 官方文档中文版</li>
+    <li>django-redis 中文文档</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -163,7 +182,9 @@
            <div itemprop="articleBody">
             
   <div class="section" id="django-redis">
-<h1>django-redis 官方文档中文版<a class="headerlink" href="#django-redis" title="永久链接至标题">¶</a></h1>
+<h1>django-redis 中文文档<a class="headerlink" href="#django-redis" title="永久链接至标题">¶</a></h1>
+<p>Andrey Antukh, <a class="reference external" href="mailto:niwi&#37;&#52;&#48;niwi&#46;be">niwi<span>&#64;</span>niwi<span>&#46;</span>be</a> 4.7.0</p>
+<p>翻译: <a class="reference external" href="https://www.rapospectre.com">RaPoSpectre</a></p>
 <div class="section" id="id1">
 <h2>1. 介绍<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h2>
 <p>django-redis 基于 BSD 许可, 是一个使 Django 支持 Redis cache/session
@@ -180,7 +201,7 @@
 <li>默认客户端主/从支持</li>
 <li>完善的测试</li>
 <li>已在一些项目的生产环境中作为 cache 和 session 使用</li>
-<li>支持无限长超时设置</li>
+<li>支持永不超时设置</li>
 <li>原生进入 redis 客户端/连接池支持</li>
 <li>高可配置 ( 例如仿真缓存的异常行为 )</li>
 <li>默认支持 unix 套接字</li>
@@ -485,6 +506,326 @@ django-redis exposes ttl function.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="keys">
+<h3>3.10 扫描 &amp; 删除键 (keys)<a class="headerlink" href="#keys" title="永久链接至标题">¶</a></h3>
+<p>django-redis 支持使用全局通配符的方式来检索或者删除键.</p>
+<p><em>使用通配符搜索的例子</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">cache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="s">&quot;foo_*&quot;</span><span class="p">)</span>
+<span class="go">[&quot;foo_1&quot;, &quot;foo_2&quot;]</span>
+</pre></div>
+</div>
+<p>这个简单的写法将返回所有匹配的值,
+但在拥有很大数据量的数据库中这样做并不合适. 在 redis 的 server side
+cursors 2.8 版及以上, 你可以使用 <code class="docutils literal"><span class="pre">iter_keys</span></code> 取代 <code class="docutils literal"><span class="pre">keys</span></code> 方法,
+<code class="docutils literal"><span class="pre">iter_keys</span></code> 将返回匹配值的迭代器, 你可以使用迭代器高效的进行遍历.</p>
+<p><em>使用 server side cursors 搜索</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">cache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">iter_keys</span><span class="p">(</span><span class="s">&quot;foo_*&quot;</span><span class="p">)</span>
+<span class="go">&lt;generator object algo at 0x7ffa9c2713a8&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">cache</span><span class="o">.</span><span class="n">iter_keys</span><span class="p">(</span><span class="s">&quot;foo_*&quot;</span><span class="p">))</span>
+<span class="go">&quot;foo_1&quot;</span>
+</pre></div>
+</div>
+<p>如果要删除键, 使用 <code class="docutils literal"><span class="pre">delete_pattern</span></code> 方法, 它和 <code class="docutils literal"><span class="pre">keys</span></code>
+方法一样也支持全局通配符, 此函数将会返回删掉的键的数量</p>
+<p><em>使用 delete_pattern 的例子</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">cache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">delete_pattern</span><span class="p">(</span><span class="s">&quot;foo_*&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="redis">
+<h3>3.11 Redis 本地命令<a class="headerlink" href="#redis" title="永久链接至标题">¶</a></h3>
+<p>django-redis 有限制的支持一些 Redis 原子操作, 例如 <code class="docutils literal"><span class="pre">SETNX</span></code> 和 <code class="docutils literal"><span class="pre">INCR</span></code>
+命令.</p>
+<p>你可以在 set() 方法中加上 <code class="docutils literal"><span class="pre">nx</span></code> 参数使用来使用 <code class="docutils literal"><span class="pre">SETNX</span></code> 命令</p>
+<p><em>例子:</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">cache</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">,</span> <span class="s">&quot;value1&quot;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">,</span> <span class="s">&quot;value2&quot;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;key&quot;</span><span class="p">)</span>
+<span class="go">&quot;value1&quot;</span>
+</pre></div>
+</div>
+<p>当值 (value) 有合适的键 (key) 时, <code class="docutils literal"><span class="pre">incr</span></code> 和 <code class="docutils literal"><span class="pre">decr</span></code> 也可以使用 Redis
+原子操作</p>
+</div>
+<div class="section" id="id15">
+<h3>3.12 原生客户端使用<a class="headerlink" href="#id15" title="永久链接至标题">¶</a></h3>
+<p>在某些情况下你的应用需要进入原生 Redis 客户端使用一些 django cache
+接口没有暴露出来的进阶特性. 为了避免储存新的原生连接所产生的另一份设置,
+django-redis 提供了方法 <code class="docutils literal"><span class="pre">get_redis_connection(alias)</span></code>
+使你获得可重用的连接字符串.</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django_redis</span> <span class="k">import</span> <span class="n">get_redis_connection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">con</span> <span class="o">=</span> <span class="n">get_redis_connection</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">con</span>
+<span class="go">&lt;redis.client.StrictRedis object at 0x2dc4510&gt;</span>
+</pre></div>
+</div>
+<p><strong>警告 不是所有的扩展客户端都支持这个特性.</strong></p>
+</div>
+<div class="section" id="id16">
+<h3>3.13 连接池<a class="headerlink" href="#id16" title="永久链接至标题">¶</a></h3>
+<p>django-redis 使用 redis-py 的连接池接口, 并提供了简单的配置方式.
+除此之外, 你可以为 backend 定制化连接池的产生.</p>
+<p>redis-py 默认不会关闭连接, 尽可能重用连接</p>
+<div class="section" id="id17">
+<h4>3.13.1 配置默认连接池<a class="headerlink" href="#id17" title="永久链接至标题">¶</a></h4>
+<p>配置默认连接池很简单, 你只需要在 <code class="docutils literal"><span class="pre">CACHES</span></code> 中使用
+<code class="docutils literal"><span class="pre">CONNECTION_POOL_KWARGS</span></code> 设置连接池的最大连接数量即可:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="o">...</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CONNECTION_POOL_KWARGS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;max_connections&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>你可以得知连接池已经打开多少连接:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="k">import</span> <span class="n">get_cache</span>
+<span class="kn">from</span> <span class="nn">django_redis</span> <span class="k">import</span> <span class="n">get_redis_connection</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">get_redis_connection</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">)</span>  <span class="c"># Use the name you have defined for Redis in settings.CACHES</span>
+<span class="n">connection_pool</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">connection_pool</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;Created connections so far: %d&quot;</span> <span class="o">%</span> <span class="n">connection_pool</span><span class="o">.</span><span class="n">_created_connections</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id18">
+<h4>3.13.2 使用你自己的连接池子类<a class="headerlink" href="#id18" title="永久链接至标题">¶</a></h4>
+<p>有时你想使用自己的连接池子类. django-redis 提供了
+<code class="docutils literal"><span class="pre">CONNECTION_POOL_CLASS</span></code> 来配置连接池子类</p>
+<p><em>myproj/mypool.py</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">redis.connection</span> <span class="k">import</span> <span class="n">ConnectionPool</span>
+
+<span class="k">class</span> <span class="nc">MyOwnPool</span><span class="p">(</span><span class="n">ConnectionPool</span><span class="p">):</span>
+    <span class="c"># Just doing nothing, only for example purpose</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p><em>setting.py</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Omitting all backend declaration boilerplate code.</span>
+
+<span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;CONNECTION_POOL_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;myproj.mypool.MyOwnPool&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connection-factory">
+<h4>3.13.3 定制化的 connection factory<a class="headerlink" href="#connection-factory" title="永久链接至标题">¶</a></h4>
+<p>如果之前的方法都不合适, 你可以定制 django-redis 的 connection factory
+过程甚至完全重写.</p>
+<p>django-redis 默认使用Django setting 中
+<code class="docutils literal"><span class="pre">DJANGO_REDIS_CONNECTION_FACTORY</span></code> 参数指定的
+<code class="docutils literal"><span class="pre">django_redis.pool.ConnectionFactory</span></code> 类产生连接.</p>
+<p><em>ConnectionFactory 类的部分接口</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="c"># Note: Using Python 3 notation for code documentation ;)</span>
+
+<span class="k">class</span> <span class="nc">ConnectionFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_connection_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c"># Given connection parameters in the `params` argument,</span>
+        <span class="c"># return new connection pool.</span>
+        <span class="c"># It should be overwritten if you want do something</span>
+        <span class="c"># before/after creating the connection pool, or return your</span>
+        <span class="c"># own connection pool.</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c"># Given connection parameters in the `params` argument,</span>
+        <span class="c"># return a new connection.</span>
+        <span class="c"># It should be overwritten if you want to do something</span>
+        <span class="c"># before/after creating a new connection.</span>
+        <span class="c"># The default implementation uses `get_connection_pool`</span>
+        <span class="c"># to obtain a pool and create a new connection in the</span>
+        <span class="c"># newly obtained pool.</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_or_create_connection_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c"># This is a high layer on top of `get_connection_pool` for</span>
+        <span class="c"># implementing a cache of created connection pools.</span>
+        <span class="c"># It should be overwritten if you want change the default</span>
+        <span class="c"># behavior.</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">make_connection_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c"># The responsibility of this method is to convert basic connection</span>
+        <span class="c"># parameters and other settings to fully connection pool ready</span>
+        <span class="c"># connection parameters.</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="c"># This is really a public API and entry point for this</span>
+        <span class="c"># factory class. This encapsulates the main logic of creating</span>
+        <span class="c"># the previously mentioned `params` using `make_connection_params`</span>
+        <span class="c"># and creating a new connection using the `get_connection` method.</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id19">
+<h3>3.14 可扩展解析器<a class="headerlink" href="#id19" title="永久链接至标题">¶</a></h3>
+<p>redis-py (django-redis 使用的 Redis 客户端) 支持的纯净 Python Redis
+解析器可以满足大部分普通任务, 但如果你想要性能更好, 可以使用 <code class="docutils literal"><span class="pre">hiredis</span></code></p>
+<p>hiredis 是一个用 C 写的 Redis 客户端, 并且他的解析器可以用在
+django-redis 中:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;PARSER_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;redis.connection.HiredisParser&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id20">
+<h3>3.15 可扩展客户端<a class="headerlink" href="#id20" title="永久链接至标题">¶</a></h3>
+<p>django_redis
+设计的非常灵活和可配置。它提供了可扩展的后端，拥有易扩展的特性.</p>
+<div class="section" id="id21">
+<h4>3.15.1 默认客户端<a class="headerlink" href="#id21" title="永久链接至标题">¶</a></h4>
+<p>我们已经说明了默认客户端几乎所有的特点, 但有一个例外:
+默认客户端支持主从配置.</p>
+<p>如果需要主从设置, 你需要更改 <code class="docutils literal"><span class="pre">LOCATION</span></code> 参数:</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+    <span class="s">&quot;redis://127.0.0.1:6378/1&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>第一个字段代表 master 服务器, 第二个字段代表 slave 服务器.</p>
+<p><strong>警告 主从设置没有在生产环境中经过大量测试</strong></p>
+</div>
+<div class="section" id="id22">
+<h4>3.15.2 分片客户端<a class="headerlink" href="#id22" title="永久链接至标题">¶</a></h4>
+<p>此可扩展客户端实现了客户端分片, 它几乎继承了默认客户端的全部功能.
+如果需要使用, 请将配置改成这样</p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+            <span class="s">&quot;redis://127.0.0.1:6379/2&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.ShardClient&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>警告 分片客户端仍处于试验阶段, 请在生产环境中谨慎使用</strong></p>
+</div>
+<div class="section" id="id23">
+<h4>3.15.3 集群客户端<a class="headerlink" href="#id23" title="永久链接至标题">¶</a></h4>
+<p>我们同时也在尝试解决惊群问题, 更多信息请阅读<a class="reference external" href="https://en.wikipedia.org/wiki/Thundering_herd_problem">Wikipedia</a></p>
+<p>和上文讲的一样, 客户端基本继承了默认客户端所有功能,
+增加额外的方法以获取/设置键 (keys)</p>
+<p><em>设置举例</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.HerdClient&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>一些其他的设置:</p>
+<ul class="simple">
+<li>CACHE_HERD_TIMEOUT: 设置集群超时 (默认值为: 60s)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id24">
+<h3>3.16 可扩展序列器<a class="headerlink" href="#id24" title="永久链接至标题">¶</a></h3>
+<p>客户端在将数据发给服务器之前先会序列化数据. django-redis 默认使用 Python
+pickle 序列化数据.</p>
+<p>如果需要使用 json 序列化数据, 使用 JSONSerializer</p>
+<p><em>设置举例</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+            <span class="s">&quot;SERIALIZER&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.serializers.json.JSONSerializer&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>使用 MsgPack <a class="reference external" href="http://msgpack.org/">http://msgpack.org/</a> 进行序列化 (需要 msgpack-python 库支持)</p>
+<p><em>设置举例</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.cache.RedisCache&quot;</span><span class="p">,</span>
+        <span class="s">&quot;LOCATION&quot;</span><span class="p">:</span> <span class="s">&quot;redis://127.0.0.1:6379/1&quot;</span><span class="p">,</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.client.DefaultClient&quot;</span><span class="p">,</span>
+            <span class="s">&quot;SERIALIZER&quot;</span><span class="p">:</span> <span class="s">&quot;django_redis.serializers.msgpack.MSGPackSerializer&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id25">
+<h3>3.17 可扩展 Redis 客户端<a class="headerlink" href="#id25" title="永久链接至标题">¶</a></h3>
+<p>django-redis 默认使用 <code class="docutils literal"><span class="pre">redis.client.StrictClient</span></code> 作为 Redis 客户端,
+你可以使用其他客户端替代, 比如之前在讲测试时我们用 fakeredis
+代替真实客户端.</p>
+<p>使用 <code class="docutils literal"><span class="pre">REDIS_CLIENT_CLASS</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">CACHES</span></code> 来配置你的客户端, 使用
+<code class="docutils literal"><span class="pre">REDIS_CLIENT_KWARGS</span></code> 提供配置客户端的参数 (可选).</p>
+<p><em>设置举例</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;REDIS_CLIENT_CLASS&quot;</span><span class="p">:</span> <span class="s">&quot;my.module.ClientClass&quot;</span><span class="p">,</span>
+            <span class="s">&quot;REDIS_CLIENT_KWARGS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;some_setting&quot;</span><span class="p">:</span> <span class="k">True</span><span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id26">
+<h2>4. 许可<a class="headerlink" href="#id26" title="永久链接至标题">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre>Copyright (c) 2011-2015 Andrey Antukh &lt;niwi@niwi.nz&gt;
+Copyright (c) 2011 Sean Bleier
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS&#39;&#39; AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -498,7 +839,7 @@ django-redis exposes ttl function.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, rapospectre.
+        &copy; Copyright 2017, <a href="https://www.rapospectre.com">RaPoSpectre</a>
 
     </p>
   </div>

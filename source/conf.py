@@ -46,8 +46,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Django-Redis'
-copyright = u'2017, rapospectre'
-author = u'rapospectre'
+copyright = u'2017, RaPoSpectre'
+author = u'RaPoSpectre'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
