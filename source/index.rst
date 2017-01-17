@@ -119,7 +119,7 @@ django-redis 基于 BSD 许可, 是一个使 Django 支持 Redis cache/session
 -  如果使用 redis:// scheme, 可以直接将数字写在路径中, 例如:
    redis://localhost/0
 
-在某些环境下连接密码不是 url 安全的, 这时你可以忽略密码或者使用方便的
+在某些环境下连接密码放在 url 是不安全的, 这时你可以忽略密码或者使用方便的
 OPTIONS 设置:
 
 ::
